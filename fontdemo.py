@@ -93,6 +93,11 @@ class Bitmap:
         rows = ''
         for y in range(self.height):
             for x in range(self.width):
-                rows += '*' if self.pixels[y * self.width + x] else ' '
+                rows += '██' if self.pixels[y * self.width + x] else '  '
             rows += '\n'
         return rows
+
+
+if __name__ == '__main__':
+    fnt = Font('OpenSans-Regular.ttf', 40)
+    print(fnt.render_character('P'))
