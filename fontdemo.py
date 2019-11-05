@@ -36,10 +36,9 @@ class Glyph:
     @staticmethod
     def unpack_mono_bitmap(bitmap):
         """Unpack a freetype FT_LOAD_TARGET_MONO glyph bitmap into
-        a bytearray where each pixel is represented by a single byte.
+        a list where each pixel is represented by True or False.
         """
-        # Allocate a bytearray of sufficient size to hold the glyph bitmap.
-        data = bytearray(bitmap.rows * bitmap.width)
+        data = []
 
         # Iterate over every byte in the glyph bitmap. Note that we're not
         # iterating over every pixel in the resulting unpacked bitmap --
@@ -54,10 +53,6 @@ class Glyph:
                 # determines where we'll read the next batch of pixels from.
                 num_bits_done = byte_index * 8
 
-                # Pre-compute where to write the pixels that we're going
-                # to unpack from the current byte in the glyph bitmap.
-                rowstart = y * bitmap.width + byte_index * 8
-
                 # Iterate over every bit (=pixel) that's still a part of the
                 # output bitmap. Sometimes we're only unpacking a fraction
                 # of a byte because glyphs may not always fit on a byte
@@ -68,25 +63,23 @@ class Glyph:
                     # Unpack the next pixel from the current glyph byte.
                     bit = byte_value & (1 << (7 - bit_index))
 
-                    # Write the pixel to the output bytearray. We ensure
-                    # that `off` pixels have a value of 0 and `on` pixels
-                    # have a value of 1.
-                    data[rowstart + bit_index] = 1 if bit else 0
+                    # Write the pixel to the output list. We ensure that
+                    # `off` pixels have a value of False and `on` pixels
+                    # have a value of True.
+                    data.append(bool(bit))
 
         return data
 
 
 class Bitmap:
-    """A 2D bitmap image represented as a list of byte values. Each
-    byte indicates the state of a single pixel in the bitmap. A value
-    of 0 indicates that the pixel is `off` and any other value
-    indicates that it is `on`.
+    """A 2D bitmap image represented as a list of boolean values. Each
+    boolean value indicates the state of a single pixel in the bitmap.
     """
 
-    def __init__(self, width, height, pixels=None):
+    def __init__(self, width, height, pixels):
         self.width = width
         self.height = height
-        self.pixels = pixels or bytearray(width * height)
+        self.pixels = pixels
 
     def __repr__(self):
         """Return a string representation of the bitmap's pixels."""
