@@ -112,10 +112,13 @@ class Bitmap:
     boolean value indicates the state of a single pixel in the bitmap.
     """
 
-    def __init__(self, width, height, pixels):
+    def __init__(self, width, height, pixels=None):
         self.width = width
         self.height = height
-        self.pixels = pixels
+        if pixels is None:
+            self.pixels = [False for __ in range(width * height)]
+        else:
+            self.pixels = pixels
 
     def __repr__(self):
         """Return a string representation of the bitmap's pixels."""
