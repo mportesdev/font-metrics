@@ -20,18 +20,74 @@ class Font:
         glyph = self.glyph_for_character(char)
         return glyph.bitmap
 
+    def text_dimensions(self, text):
+        """Return (width, height, baseline) of `text` rendered in the
+        current font.
+        """
+        width = 0
+        max_ascent = 0
+        max_descent = 0
+        previous_char = None
+
+        for char in text:
+            glyph = self.glyph_for_character(char)
+            max_ascent = max(max_ascent, glyph.ascent)
+            max_descent = max(max_descent, glyph.descent)
+            width += glyph.advance_width
+            previous_char = char
+
+        height = max_ascent + max_descent
+        return width, height, max_descent
+
+    def render_text(self, text, width=None, height=None, baseline=None):
+        """Render the given `text` into a Bitmap and return it.
+
+        If `width`, `height`, and `baseline` are not specified they
+        are computed using the `text_dimensions' method.
+        """
+        if None in (width, height, baseline):
+            width, height, baseline = self.text_dimensions(text)
+
+        x = 0
+        previous_char = None
+        outbuffer = Bitmap(width, height)
+
+        for char in text:
+            glyph = self.glyph_for_character(char)
+            y = height - glyph.ascent - baseline
+            outbuffer.bitblt(glyph.bitmap, x, y)
+            x += glyph.advance_width
+            previous_char = char
+
+        return outbuffer
+
 
 class Glyph:
 
-    def __init__(self, pixels, width, height):
+    def __init__(self, pixels, width, height, top, advance_width):
         self.bitmap = Bitmap(width, height, pixels)
+
+        self.top = top
+        self.descent = max(0, self.height - self.top)
+        self.ascent = max(0, max(self.top, self.height) - self.descent)
+        self.advance_width = advance_width
+
+    @property
+    def width(self):
+        return self.bitmap.width
+
+    @property
+    def height(self):
+        return self.bitmap.height
 
     @staticmethod
     def from_glyphslot(slot):
         """Construct and return a Glyph object from a FreeType GlyphSlot."""
         pixels = Glyph.unpack_mono_bitmap(slot.bitmap)
         width, height = slot.bitmap.width, slot.bitmap.rows
-        return Glyph(pixels, width, height)
+        top = slot.bitmap_top
+        advance_width = slot.advance.x // 64
+        return Glyph(pixels, width, height, top, advance_width)
 
     @staticmethod
     def unpack_mono_bitmap(bitmap):
@@ -67,7 +123,22 @@ class Bitmap:
                                  for x in range(self.width))
                          for y in range(self.height))
 
+    def bitblt(self, src, x, y):
+        """Copy all pixels from `src` into this bitmap, starting at
+        (`x`, `y`)."""
+        srcpixel = 0
+        dstpixel = y * self.width + x
+        row_offset = self.width - src.width
+
+        for sy in range(src.height):
+            for sx in range(src.width):
+                self.pixels[dstpixel] = src.pixels[srcpixel]
+                srcpixel += 1
+                dstpixel += 1
+            dstpixel += row_offset
+
 
 if __name__ == '__main__':
     fnt = Font('OpenSans-Regular.ttf', 40)
     print(fnt.render_character('P'))
+    print(fnt.render_text('Py'))
