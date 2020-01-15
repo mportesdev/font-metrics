@@ -133,12 +133,6 @@ class Bitmap:
         else:
             self.pixels = pixels
 
-    def __repr__(self):
-        """Return a string representation of the bitmap's pixels."""
-        return '\n'.join(''.join('██' if self.pixels[y*self.width + x] else '  '
-                                 for x in range(self.width))
-                         for y in range(self.height))
-
     def bitblt(self, src, x, y):
         """Copy all pixels from `src` into this bitmap, starting at
         (`x`, `y`)."""
