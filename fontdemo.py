@@ -156,5 +156,15 @@ class Bitmap:
 
 
 if __name__ == '__main__':
-    fnt = Font('OpenSans-Regular.ttf', 40)
-    fnt.render_text('AV Wa').show()
+    fnt = Font('NotoSerif-Regular.ttf', 40)
+    print(f'Font: {fnt.face.family_name.decode()}'
+          f' {fnt.face.style_name.decode()} {fnt.face.size.y_ppem} px')
+
+    text = 'I \u2097\u2092\u02ef\u2091 Python'
+    print(f'Text to display: {text!r}')
+
+    bitmap = fnt.render_text(text)
+    print(f'Pixel dimensions of displayed text: {bitmap.width}'
+          f' x {bitmap.height} px')
+
+    bitmap.show()
