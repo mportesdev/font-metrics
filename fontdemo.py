@@ -20,6 +20,10 @@ class Font:
         glyph = self.glyph_for_character(char)
         return glyph.bitmap
 
+    def kerning_offset(self, previous_char, char):
+        kerning = self.face.get_kerning(previous_char, char)
+        return kerning.x // 64
+
     def text_dimensions(self, text):
         """Return (width, height, baseline) of `text` rendered in the
         current font.
@@ -33,7 +37,11 @@ class Font:
             glyph = self.glyph_for_character(char)
             max_ascent = max(max_ascent, glyph.ascent)
             max_descent = max(max_descent, glyph.descent)
-            width += glyph.advance_width
+            kerning_x = self.kerning_offset(previous_char, char)
+
+            width += max(glyph.advance_width + kerning_x,
+                         glyph.width + kerning_x)
+
             previous_char = char
 
         height = max_ascent + max_descent
@@ -54,8 +62,12 @@ class Font:
 
         for char in text:
             glyph = self.glyph_for_character(char)
+
+            x += self.kerning_offset(previous_char, char)
             y = height - glyph.ascent - baseline
+
             outbuffer.bitblt(glyph.bitmap, x, y)
+
             x += glyph.advance_width
             previous_char = char
 
@@ -135,7 +147,8 @@ class Bitmap:
 
         for sy in range(src.height):
             for sx in range(src.width):
-                self.pixels[dstpixel] = src.pixels[srcpixel]
+                self.pixels[dstpixel] = self.pixels[dstpixel] \
+                                        or src.pixels[srcpixel]
                 srcpixel += 1
                 dstpixel += 1
             dstpixel += row_offset
@@ -144,4 +157,4 @@ class Bitmap:
 if __name__ == '__main__':
     fnt = Font('OpenSans-Regular.ttf', 40)
     print(fnt.render_character('P'))
-    print(fnt.render_text('Py'))
+    print(fnt.render_text('AV Wa'))
