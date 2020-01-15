@@ -1,4 +1,5 @@
 import freetype
+from PIL import Image
 
 
 class Font:
@@ -153,8 +154,13 @@ class Bitmap:
                 dstpixel += 1
             dstpixel += row_offset
 
+    def show(self):
+        img = Image.new('P', (self.width, self.height))
+        img.putpalette(bytes.fromhex('000000ffffff'))
+        img.frombytes(bytes(self.pixels))
+        img.show()
+
 
 if __name__ == '__main__':
     fnt = Font('OpenSans-Regular.ttf', 40)
-    print(fnt.render_character('P'))
-    print(fnt.render_text('AV Wa'))
+    fnt.render_text('AV Wa').show()
