@@ -155,16 +155,16 @@ class Bitmap:
         img.show()
 
 
-if __name__ == '__main__':
-    fnt = Font('NotoSerif-Regular.ttf', 40)
-    print(f'Font: {fnt.face.family_name.decode()}'
-          f' {fnt.face.style_name.decode()} {fnt.face.size.y_ppem} px')
-
-    text = 'I \u2097\u2092\u02ef\u2091 Python'
+def main(font, text):
+    print(f'Font: {font.face.family_name.decode()}'
+          f' {font.face.style_name.decode()} {font.face.size.y_ppem} px')
     print(f'Text to display: {text!r}')
 
-    bitmap = fnt.render_text(text)
+    bitmap = font.render_text(text)
     print(f'Pixel dimensions of displayed text: {bitmap.width}'
           f' x {bitmap.height} px')
-
     bitmap.show()
+
+
+if __name__ == '__main__':
+    main(Font('NotoSerif-Regular.ttf', 40), 'I kinda \u2665 Python')
