@@ -167,4 +167,7 @@ def main(font, text):
 
 
 if __name__ == '__main__':
-    main(Font('NotoSerif-Regular.ttf', 40), 'I kinda \u2665 Python')
+    text = 'I \u2665 Python'
+    main(Font('NotoSerif-Regular.ttf', 40), text)
+    main(Font('NanumPenScript-Regular.ttf', 56), text)
+    main(Font('PressStart2P-Regular.ttf', 32), text)
