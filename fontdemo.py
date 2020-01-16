@@ -93,14 +93,14 @@ class Glyph:
     def height(self):
         return self.bitmap.height
 
-    @staticmethod
-    def from_glyphslot(slot):
+    @classmethod
+    def from_glyphslot(cls, slot):
         """Construct and return a Glyph object from a FreeType GlyphSlot."""
-        pixels = Glyph.unpack_mono_bitmap(slot.bitmap)
+        pixels = cls.unpack_mono_bitmap(slot.bitmap)
         width, height = slot.bitmap.width, slot.bitmap.rows
         top = slot.bitmap_top
         advance_width = slot.advance.x // 64
-        return Glyph(pixels, width, height, top, advance_width)
+        return cls(pixels, width, height, top, advance_width)
 
     @staticmethod
     def unpack_mono_bitmap(bitmap):
