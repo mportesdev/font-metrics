@@ -107,16 +107,14 @@ class Glyph:
         """Unpack a freetype FT_LOAD_TARGET_MONO glyph bitmap into
         a list where each pixel is represented by True or False.
         """
-        assert len(bitmap.buffer) == bitmap.rows * bitmap.pitch
         data = []
+        leftmost_bit = 2 ** (8*bitmap.pitch - 1)
 
         for row in zip(*[iter(bitmap.buffer)] * bitmap.pitch):
             row_int = int.from_bytes(row, 'big')
-            bin_str = f'{row_int:0{bitmap.pitch*8}b}'[:bitmap.width]
-            assert len(bin_str) == bitmap.width
-            data.extend(bit == '1' for bit in bin_str)
+            data.extend(bool((row_int << i) & leftmost_bit)
+                        for i in range(bitmap.width))
 
-        assert len(data) == bitmap.rows * bitmap.width
         return data
 
 
